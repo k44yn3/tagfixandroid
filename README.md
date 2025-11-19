@@ -1,4 +1,4 @@
-# TagFix 🎵
+# TagFix 
 
 A modern, beautiful web-based audio metadata editor with Material You design.
 
@@ -125,5 +125,3 @@ MIT License - See [LICENSE](LICENSE) file for details
 For questions or support, please open an issue on GitHub.
 
 ---
-
-**Made with ❤️ and Material You**
