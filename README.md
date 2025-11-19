@@ -89,7 +89,7 @@ python app.py
 ```
 Then open your browser and enter: [**http://127.0.0.1:5000**](http://127.0.0.1:5000) to run the app!
 
-**Command Line (Classic):**
+**Command Line (Classic & have more miscellanous features):**
 ```bash
 python tagfix.py
 ```
