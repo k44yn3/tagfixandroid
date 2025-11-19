@@ -1,3 +1,4 @@
+"""markdown
 
 ![Python](https://img.shields.io/badge/python-3.7+-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
@@ -38,39 +39,59 @@ A modern, beautiful web-based audio metadata editor with Material You design.
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/tagfix.git
+git clone https://github.com/k44yn3/tagfix.git
 cd tagfix
+
+# (Optional but recommended) Create and activate a virtual environment
+python -m venv .venv
+# Windows (PowerShell)
+.\.venv\Scripts\Activate.ps1
+# Windows (cmd.exe)
+.\.venv\Scripts\activate.bat
+# macOS / Linux
+source .venv/bin/activate
 
 # Install Python dependencies
 pip install -r requirements.txt
-
-# (Optional) Install FFmpeg for conversion features
-# Ubuntu/Debian:
-sudo apt install ffmpeg
-
-# Fedora:
-sudo dnf install ffmpeg
-
-# macOS:
-brew install ffmpeg
 ```
+
+### Installing FFmpeg (optional, for conversion features)
+
+- Windows:
+  - Option A (chocolatey):
+    - Install Chocolatey if you don't have it: https://chocolatey.org/install
+    - Then run (in an elevated Command Prompt or PowerShell):
+      choco install ffmpeg -y
+    - Ensure ffmpeg is available on PATH (restart terminal if needed).
+  - Option B (manual):
+    - Download a static build from https://ffmpeg.org/download.html#windows or https://www.gyan.dev/ffmpeg/builds/
+    - Extract and add the `bin` folder to your PATH (System Properties → Environment Variables → Path → Edit).
+
+- Ubuntu/Debian:
+  sudo apt install ffmpeg
+
+- Fedora:
+  sudo dnf install ffmpeg
+
+- macOS:
+  brew install ffmpeg
 
 ### 2. Run the Application
 
-**Web Interface:**
+**Web Interface (local):**
 ```bash
-python3 app.py
+python app.py
 ```
 Then open your browser to: **http://127.0.0.1:5000**
 
 **Command Line (Classic):**
 ```bash
-python3 tagfix.py
+python tagfix.py
 ```
 
 ## 📖 Usage
 
-1. **Enter a folder path** in the input field (e.g., `/home/user/Music`)
+1. **Enter a folder path** in the input field (e.g., `/home/user/Music` or `C:\Users\YourName\Music`)
 2. **Click Scan** to load all audio files
 3. **Edit metadata** directly in the cards
 4. **Upload cover art** by clicking "Change Cover"
@@ -129,3 +150,5 @@ MIT License - See [LICENSE](LICENSE) file for details
 For questions or support, please open an issue on GitHub.
 
 ---
+
+"""
