@@ -221,10 +221,11 @@ class _EditorPanelState extends State<EditorPanel> {
                 ),
               ),
             ],
-          ),
+          ],
           const SizedBox(height: 24),
           
-          // Conversion Actions
+          // Conversion Actions - Disabled (FFmpeg not available on Android)
+          /* 
           const Divider(),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 8.0),
@@ -323,6 +324,7 @@ class _EditorPanelState extends State<EditorPanel> {
               ),
             ],
           ),
+          */
           const SizedBox(height: 24),
           
           // Lyrics Section
