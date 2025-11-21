@@ -38,4 +38,3 @@ flutter run -d linux  # or windows, macos
 - `lib/providers`: State management (`AppState`).
 - `lib/screens`: UI Screens (`MainScreen`).
 - `lib/widgets`: Reusable widgets (`FileList`, `EditorPanel`, `CoverArtWidget`).
-
