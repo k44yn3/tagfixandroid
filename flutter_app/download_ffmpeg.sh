@@ -1,51 +1,105 @@
 #!/bin/bash
 
-# FFmpeg Binary Download Script for TagFix
+# Platform-Adaptive FFmpeg Binary Download Script for TagFix
 # Run this from the flutter_app directory
 
 set -e
 
-echo "=== TagFix FFmpeg Binary Download Script ==="
+echo "=== TagFix FFmpeg Platform-Aware Download Script ==="
 echo
 
-# Create directories
-mkdir -p assets/ffmpeg/{linux,windows,macos}
+OS="$(uname -s)"
 
-# Download Linux binary
-echo "📥 Downloading Linux ffmpeg..."
-cd assets/ffmpeg/linux
-wget -q --show-progress https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz
-tar -xf ffmpeg-release-amd64-static.tar.xz --strip-components=1 --wildcards '*/ffmpeg'
-rm -f ffmpeg-release-amd64-static.tar.xz
-chmod +x ffmpeg
-echo "✅ Linux binary ready"
-cd ../../..
+mkdir -p assets/ffmpeg
+cd assets/ffmpeg
 
-# Download Windows binary  
-echo "📥 Downloading Windows ffmpeg..."
-cd assets/ffmpeg/windows
-wget -q --show-progress https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip
-unzip -q -j ffmpeg-master-latest-win64-gpl.zip "*/bin/ffmpeg.exe"
-rm -f ffmpeg-master-latest-win64-gpl.zip
-echo "✅ Windows binary ready"
-cd ../../..
+#########################################
+# DETECT PLATFORM
+#########################################
+case "$OS" in
+    Linux*)
+        PLATFORM="linux"
+        ;;
+    Darwin*)
+        PLATFORM="macos"
+        ;;
+    MINGW*|MSYS*|CYGWIN*)
+        PLATFORM="windows"
+        ;;
+    *)
+        echo "Unsupported OS: $OS"
+        exit 1
+        ;;
+esac
 
-# Download macOS binary
-echo "📥 Downloading macOS ffmpeg..."
-cd assets/ffmpeg/macos
-wget -q --show-progress https://evermeet.cx/ffmpeg/getrelease/ffmpeg/zip -O ffmpeg.zip
-unzip -q ffmpeg.zip
-rm -f ffmpeg.zip
-chmod +x ffmpeg
-echo "✅ macOS binary ready"
-cd ../../..
+echo "Detected platform: $PLATFORM"
+mkdir -p "$PLATFORM"
+cd "$PLATFORM"
 
+
+#########################################
+# DOWNLOAD FOR LINUX
+#########################################
+if [ "$PLATFORM" = "linux" ]; then
+    echo "[Linux] Downloading ffmpeg..."
+
+    wget -q --show-progress https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz
+
+    mkdir temp_extract
+    tar -xf ffmpeg-release-amd64-static.tar.xz -C temp_extract
+
+    FOUND_FFMPEG=$(find temp_extract -type f -name ffmpeg | head -n 1)
+    if [ -z "$FOUND_FFMPEG" ]; then
+        echo "Error: ffmpeg not found in archive"
+        exit 1
+    fi
+
+    mv "$FOUND_FFMPEG" ./ffmpeg
+    chmod +x ffmpeg
+
+    rm -rf temp_extract ffmpeg-release-amd64-static.tar.xz
+    echo "[Linux] ffmpeg ready"
+fi
+
+
+#########################################
+# DOWNLOAD FOR WINDOWS
+#########################################
+if [ "$PLATFORM" = "windows" ]; then
+    echo "[Windows] Downloading ffmpeg..."
+
+    wget -q --show-progress https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip
+
+    unzip -q -j ffmpeg-master-latest-win64-gpl.zip "*/bin/ffmpeg.exe"
+    rm -f ffmpeg-master-latest-win64-gpl.zip
+
+    echo "[Windows] ffmpeg ready"
+fi
+
+
+#########################################
+# DOWNLOAD FOR macOS
+#########################################
+if [ "$PLATFORM" = "macos" ]; then
+    echo "[macOS] Downloading ffmpeg..."
+
+    wget -q --show-progress https://evermeet.cx/ffmpeg/getrelease/ffmpeg/zip -O ffmpeg.zip
+    unzip -q ffmpeg.zip
+
+    rm -f ffmpeg.zip
+    chmod +x ffmpeg
+
+    echo "[macOS] ffmpeg ready"
+fi
+
+
+#########################################
+# SUMMARY
+#########################################
 echo
-echo "🎉 All ffmpeg binaries downloaded successfully!"
+echo "Download completed."
 echo
-echo "Binary sizes:"
-ls -lh assets/ffmpeg/linux/ffmpeg
-ls -lh assets/ffmpeg/windows/ffmpeg.exe
-ls -lh assets/ffmpeg/macos/ffmpeg
+echo "Binary details:"
+ls -lh ffmpeg* || true
 echo
-echo "You can now build the Flutter app with: flutter build linux/windows/macos"
+echo "You can now build the Flutter app normally."
