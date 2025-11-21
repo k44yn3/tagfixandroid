@@ -67,7 +67,12 @@ android {
 
     buildTypes {
         release {
-            signingConfig signingConfigs.release
+            // Use release signing if keys exist, otherwise fallback to debug signing
+            if (keystorePropertiesFile.exists()) {
+                signingConfig signingConfigs.release
+            } else {
+                signingConfig signingConfigs.debug
+            }
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
