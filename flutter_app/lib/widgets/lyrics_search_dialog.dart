@@ -75,8 +75,12 @@ class _LyricsSearchDialogState extends State<LyricsSearchDialog> {
     } catch (e) {
       if (mounted) {
         setState(() => _isSearching = false);
+        ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error searching lyrics: $e')),
+          SnackBar(
+            content: Text('Error searching lyrics: $e'),
+            duration: const Duration(seconds: 3),
+          ),
         );
       }
     }
@@ -311,11 +315,13 @@ class _LyricsSearchDialogState extends State<LyricsSearchDialog> {
         ),
         const SizedBox(height: 8),
         Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+          child: Material(
+            color: Colors.transparent,
+            shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
+              side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
             ),
+            clipBehavior: Clip.antiAlias,
             child: _results.isEmpty && !_isSearching
                 ? const Center(child: Text('No results found'))
                 : ListView.separated(

@@ -36,7 +36,8 @@ class _EditorPanelState extends State<EditorPanel> {
   @override
   void didUpdateWidget(covariant EditorPanel oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.file != widget.file) {
+    // Only re-initialize controllers if we switched to a completely different file
+    if (oldWidget.file.path != widget.file.path) {
       _initControllers();
     } else if (oldWidget.file.hasPendingChanges != widget.file.hasPendingChanges) {
       _checkForChanges();
@@ -142,15 +143,21 @@ class _EditorPanelState extends State<EditorPanel> {
     
     if (mounted) {
       if (success) {
+        ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Changes applied successfully')),
+          const SnackBar(
+            content: Text('Changes applied successfully'),
+            duration: Duration(seconds: 3),
+          ),
         );
         // Reset change state (though reload will trigger initControllers anyway)
         setState(() => _hasUnsavedChanges = false);
       } else {
+        ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Failed to apply some changes. Check permissions.'),
+            duration: Duration(seconds: 3),
             backgroundColor: Colors.red,
           ),
         );

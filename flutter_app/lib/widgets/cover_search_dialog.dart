@@ -218,6 +218,7 @@ class _CoverSearchDialogState extends State<CoverSearchDialog> {
                     
                     // Results List
                     ...(_searchResults!.map((release) => Card(
+                      clipBehavior: Clip.antiAlias,
                       color: _selectedRelease?.id == release.id
                           ? Theme.of(context).colorScheme.primaryContainer
                           : null,

@@ -86,9 +86,11 @@ class _MainScreenState extends State<MainScreen> {
 
     if (!hasPermission) {
       if (mounted) {
+        ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Storage permission is required to access audio files'),
+            duration: Duration(seconds: 3),
             action: SnackBarAction(label: 'Settings', onPressed: openAppSettings),
           ),
         );
@@ -223,11 +225,13 @@ class _MainScreenState extends State<MainScreen> {
             : selectedFile == null
                 ? const FileList() // Portrait - show file list
                 : EditorPanel(file: selectedFile), // Portrait - show editor
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: _openFolder,
-          icon: const Icon(Icons.folder_open),
-          label: const Text('Open Folder'),
-        ),
+        floatingActionButton: selectedFile == null 
+            ? FloatingActionButton.extended(
+                onPressed: _openFolder,
+                icon: const Icon(Icons.folder_open),
+                label: const Text('Open Folder'),
+              )
+            : null,
         bottomNavigationBar: selectedFile != null && !isLandscape
             ? BottomAppBar(
                 child: Padding(
