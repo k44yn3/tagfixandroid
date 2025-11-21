@@ -6,7 +6,7 @@ This project is a port of the original TagFix desktop application to Android.
 
 ## Download
 
-[Download the latest APK here](https://github.com/k44yn3/tagfix/releases)
+[Download the latest APK here](https://github.com/k44yn3/tagfixandroid/releases)
 
 **Minimum Android Version:** Android 7.0 (API 24) and above
 
@@ -53,31 +53,9 @@ flutter build apk --release
 
 The APK will be located at `build/app/outputs/flutter-apk/app-release.apk`
 
-### Release Signing
-
-For release builds with proper signing:
-
-1. Generate a keystore:
-```bash
-keytool -genkey -v -keystore ~/upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
-```
-
-2. Create `android/key.properties` (see `android/key.properties.template`):
-```properties
-storePassword=<your-password>
-keyPassword=<your-password>
-keyAlias=upload
-storeFile=/path/to/upload-keystore.jks
-```
-
-3. Build the signed APK:
-```bash
-flutter build apk --release
-```
-
 ## Credits
 
-- Ported from the original TagFix application
+- Ported from the original [TagFix]([https](https://github.com/k44yn3/tagfix)
 - Flutter
 - MusicBrainz
 - LRCLIB
