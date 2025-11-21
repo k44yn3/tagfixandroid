@@ -4,5 +4,5 @@
 -keep class io.flutter.view.**  { *; }
 -keep class io.flutter.**  { *; }
 -keep class io.flutter.plugins.**  { *; }
--keep class com.arthenica.ffmpegkit.** { *; }
+-keep class com.arthenica.mobileffmpeg.** { *; }
 -dontwarn io.flutter.embedding.**

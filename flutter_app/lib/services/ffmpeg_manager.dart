@@ -1,9 +1,10 @@
 import 'dart:io';
-import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter/return_code.dart';
+import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 
 class FfmpegManager {
   static FfmpegManager? _instance;
+  final FlutterFFmpeg _flutterFFmpeg = FlutterFFmpeg();
+  final FlutterFFmpegConfig _flutterFFmpegConfig = FlutterFFmpegConfig();
   bool _isAvailable = true;
   
   FfmpegManager._();
@@ -17,14 +18,12 @@ class FfmpegManager {
   /// Returns true if successful, false otherwise
   Future<bool> executeCommand(String command) async {
     try {
-      final session = await FFmpegKit.execute(command);
-      final returnCode = await session.getReturnCode();
+      final int rc = await _flutterFFmpeg.execute(command);
       
-      if (ReturnCode.isSuccess(returnCode)) {
+      if (rc == 0) {
         return true;
       } else {
-        final output = await session.getOutput();
-        print('FFmpeg command failed: $output');
+        print('FFmpeg command failed with return code: $rc');
         return false;
       }
     } catch (e) {
@@ -39,14 +38,30 @@ class FfmpegManager {
     Function(double)? onProgress,
   ) async {
     try {
-      final session = await FFmpegKit.execute(command);
-      final returnCode = await session.getReturnCode();
+      // Enable statistics callback for progress tracking
+      if (onProgress != null) {
+        _flutterFFmpegConfig.enableStatisticsCallback((statistics) {
+          // Calculate progress based on time
+          final time = statistics.time;
+          if (time > 0) {
+            // This is a simplified progress calculation
+            // You might need to adjust based on total duration
+            onProgress(time.toDouble());
+          }
+        });
+      }
       
-      if (ReturnCode.isSuccess(returnCode)) {
+      final int rc = await _flutterFFmpeg.execute(command);
+      
+      // Disable callback after execution
+      if (onProgress != null) {
+        _flutterFFmpegConfig.enableStatisticsCallback(null);
+      }
+      
+      if (rc == 0) {
         return true;
       } else {
-        final output = await session.getOutput();
-        print('FFmpeg command failed: $output');
+        print('FFmpeg command failed with return code: $rc');
         return false;
       }
     } catch (e) {
@@ -63,9 +78,8 @@ class FfmpegManager {
   /// Get FFmpeg version
   Future<String?> getVersion() async {
     try {
-      final session = await FFmpegKit.execute('-version');
-      final output = await session.getOutput();
-      return output?.split('\n').first;
+      final String? version = await _flutterFFmpegConfig.getFFmpegVersion();
+      return version;
     } catch (e) {
       print('Error getting FFmpeg version: $e');
       return null;
