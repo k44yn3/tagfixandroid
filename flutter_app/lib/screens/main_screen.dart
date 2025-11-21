@@ -13,8 +13,15 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
+class _MainScreenState extends State<MainScreen> {
   bool _isSearching = false;
   final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _checkPermissions();
+  }
 
   @override
   void dispose() {
