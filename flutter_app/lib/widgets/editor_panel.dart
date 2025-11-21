@@ -224,7 +224,8 @@ class _EditorPanelState extends State<EditorPanel> {
           ),
           const SizedBox(height: 24),
           
-          // Conversion Actions
+          // Conversion Actions - Disabled
+          /*
           const Divider(),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 8.0),
@@ -234,95 +235,16 @@ class _EditorPanelState extends State<EditorPanel> {
             spacing: 8,
             children: [
               FilledButton.tonal(
-                onPressed: () async {
-                   final ffmpeg = FfmpegService();
-                   final outputDir = await ffmpeg.convertToWav(widget.file);
-                   if (mounted) {
-                     if (outputDir != null) {
-                       showDialog(
-                         context: context,
-                         builder: (context) => AlertDialog(
-                           title: const Text('Conversion Successful'),
-                           content: Column(
-                             mainAxisSize: MainAxisSize.min,
-                             crossAxisAlignment: CrossAxisAlignment.start,
-                             children: [
-                               const Text('File converted to WAV format.'),
-                               const SizedBox(height: 16),
-                               const Text('Output folder:', style: TextStyle(fontWeight: FontWeight.bold)),
-                               const SizedBox(height: 8),
-                               SelectableText(
-                                 outputDir,
-                                 style: TextStyle(
-                                   fontFamily: 'monospace',
-                                   color: Theme.of(context).colorScheme.primary,
-                                 ),
-                               ),
-                             ],
-                           ),
-                           actions: [
-                             TextButton(
-                               onPressed: () => Navigator.pop(context),
-                               child: const Text('OK'),
-                             ),
-                           ],
-                         ),
-                       );
-                     } else {
-                       ScaffoldMessenger.of(context).showSnackBar(
-                         const SnackBar(content: Text('Conversion failed')),
-                       );
-                     }
-                   }
-                },
+                onPressed: () {}, // Disabled
                 child: const Text('Convert to WAV'),
               ),
               FilledButton.tonal(
-                onPressed: () async {
-                   final ffmpeg = FfmpegService();
-                   final outputDir = await ffmpeg.convertToFlac(widget.file);
-                   if (mounted) {
-                     if (outputDir != null) {
-                       showDialog(
-                         context: context,
-                         builder: (context) => AlertDialog(
-                           title: const Text('Conversion Successful'),
-                           content: Column(
-                             mainAxisSize: MainAxisSize.min,
-                             crossAxisAlignment: CrossAxisAlignment.start,
-                             children: [
-                               const Text('File converted to FLAC format.'),
-                               const SizedBox(height: 16),
-                               const Text('Output folder:', style: TextStyle(fontWeight: FontWeight.bold)),
-                               const SizedBox(height: 8),
-                               SelectableText(
-                                 outputDir,
-                                 style: TextStyle(
-                                   fontFamily: 'monospace',
-                                   color: Theme.of(context).colorScheme.primary,
-                                 ),
-                               ),
-                             ],
-                           ),
-                           actions: [
-                             TextButton(
-                               onPressed: () => Navigator.pop(context),
-                               child: const Text('OK'),
-                             ),
-                           ],
-                         ),
-                       );
-                     } else {
-                       ScaffoldMessenger.of(context).showSnackBar(
-                         const SnackBar(content: Text('Conversion failed')),
-                       );
-                     }
-                   }
-                },
+                onPressed: () {}, // Disabled
                 child: const Text('Convert to FLAC'),
               ),
             ],
           ),
+          */
           const SizedBox(height: 24),
           
           // Lyrics Section
