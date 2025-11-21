@@ -51,7 +51,7 @@ class AppState extends ChangeNotifier {
     }
   }
 
-  void selectFile(AudioFile file) {
+  void selectFile(AudioFile? file) {
     _selectedFile = file;
     notifyListeners();
   }
