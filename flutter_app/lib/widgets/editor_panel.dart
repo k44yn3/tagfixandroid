@@ -128,8 +128,17 @@ class _EditorPanelState extends State<EditorPanel> {
     if (!tagsSuccess) success = false;
     
     // Save pending changes (cover art and lyrics)
-    final pendingSuccess = await context.read<AppState>().savePendingChanges(widget.file);
-    if (!pendingSuccess) success = false;
+    // IMPORTANT: Use the updated file from AppState because updateTags has modified the tags.
+    // Using widget.file would use stale tags and overwrite the changes we just made.
+    final updatedFile = context.read<AppState>().selectedFile;
+    if (updatedFile != null) {
+      final pendingSuccess = await context.read<AppState>().savePendingChanges(updatedFile);
+      if (!pendingSuccess) success = false;
+    } else {
+      // Fallback if for some reason selectedFile is null (unlikely)
+      final pendingSuccess = await context.read<AppState>().savePendingChanges(widget.file);
+      if (!pendingSuccess) success = false;
+    }
     
     if (mounted) {
       if (success) {

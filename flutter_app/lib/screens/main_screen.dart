@@ -160,7 +160,7 @@ class _MainScreenState extends State<MainScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: _isSearching
+          title: (_isSearching && selectedFile == null)
               ? TextField(
                   controller: _searchController,
                   autofocus: true,

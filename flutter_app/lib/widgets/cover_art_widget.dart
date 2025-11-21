@@ -183,21 +183,48 @@ class CoverArtWidget extends StatelessWidget {
                 left: 8,
                 child: GestureDetector(
                   onTap: () async {
+                    // Show confirmation dialog
+                    final confirm = await showDialog<bool>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('Resize & Crop Cover Art?'),
+                        content: const Text(
+                          'This will resize the current image to 500x500 pixels.\n\n'
+                          'If the image is not square, it will be CROPPED to the center.\n'
+                          'This action cannot be undone for the preview.'
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, false),
+                            child: const Text('Cancel'),
+                          ),
+                          FilledButton(
+                            onPressed: () => Navigator.pop(context, true),
+                            child: const Text('Resize & Crop'),
+                          ),
+                        ],
+                      ),
+                    );
+
+                    if (confirm != true) return;
+
                     // Get current bytes (pending or saved)
+                    // IMPORTANT: Use the image currently shown in the preview
                     final currentBytes = hasPendingCover 
                         ? file.pendingCover!
                         : pictures!.first.bytes;
                         
                     // Resize
                     final imageService = ImageService();
-                    final resizedBytes = await imageService.resizeImage(currentBytes);
+                    // We use the width (500) for the square size
+                    final resizedBytes = await imageService.resizeImage(currentBytes, width: 500);
                     
                     if (resizedBytes != null && context.mounted) {
                       await _applyCover(context, resizedBytes);
                       
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Cover resized to 500x500 (Preview)'),
+                          content: Text('Cover resized and cropped to 500x500 (Preview)'),
                           duration: Duration(seconds: 2),
                         ),
                       );

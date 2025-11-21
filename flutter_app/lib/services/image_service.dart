@@ -10,8 +10,8 @@ class ImageService {
       final image = img.decodeImage(Uint8List.fromList(imageBytes));
       if (image == null) return null;
 
-      // Resize the image
-      final resized = img.copyResize(image, width: width, height: height);
+      // Resize the image (Crop to square)
+      final resized = img.copyResizeCropSquare(image, size: width);
 
       // Encode back to JPEG
       return img.encodeJpg(resized);
