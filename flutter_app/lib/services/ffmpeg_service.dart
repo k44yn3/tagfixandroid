@@ -29,18 +29,14 @@ class FfmpegService {
       
       final String outputPath = path.join(outputDir, '$filename.$format');
       
-      final List<String> processArgs = [
-        '-i', file.path,
-        ...args,
-        '-y', // Overwrite
-        outputPath
-      ];
-
-      final ffmpegPath = await _ffmpegManager.getFfmpegPath();
-      final result = await Process.run(ffmpegPath, processArgs);
+      // Build FFmpeg command
+      final command = '-i "${file.path}" ${args.join(' ')} -y "$outputPath"';
       
-      if (result.exitCode != 0) {
-        print('FFmpeg error: ${result.stderr}');
+      // Execute FFmpeg command
+      final success = await _ffmpegManager.executeCommand(command);
+      
+      if (!success) {
+        print('FFmpeg conversion failed');
         return null;
       }
       

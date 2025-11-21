@@ -1,0 +1,11 @@
+# This file is used for release signing configuration
+# DO NOT commit this file to version control
+# 
+# To generate a keystore for release builds:
+# keytool -genkey -v -keystore ~/upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+#
+# Then fill in the values below:
+# storePassword=<password from previous step>
+# keyPassword=<password from previous step>
+# keyAlias=upload
+# storeFile=<location of the key store file, such as /Users/<user name>/upload-keystore.jks>

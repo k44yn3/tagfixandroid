@@ -1,63 +1,87 @@
 # TagFix
 
-A powerful audio metadata editor supporting FLAC, MP3, M4A, OGG, OPUS, WMA, and WAV formats. Available as a modern Desktop App, CLI tool, and Web Interface.
+A powerful audio metadata editor for Android supporting FLAC, MP3, M4A, OGG, OPUS, WMA, and WAV formats.
 
 ## Download
 
-**[Download the latest release here](https://github.com/k44yn3/tagfix/releases)**
+**[Download the latest APK here](https://github.com/k44yn3/tagfix/releases)**
 
-Pre-built binaries are available for:
-- **Windows** (Portable .zip)
-- **Linux** (Portable .zip)
+**Minimum Android Version:** Android 7.0 (API 24) and above
+
+## Installation
+
+1. Download the APK from the releases page
+2. Enable "Install from Unknown Sources" in your Android settings if prompted
+3. Open the APK file to install
+4. Grant storage/media permissions when the app requests them
 
 ## Features
 
-- **Material Design**: Modern interface with dynamic theming.
-- **Metadata Editing**: Edit Title, Artist, Album, Year, Genre, Track/Disc numbers.
-- **Cover Art**: View and update album covers.
-- **Format Conversion**: Convert files to WAV or FLAC.
-- **Recursive Scanning**: Process entire directories at once.
-- **Cross-Platform**: Consistent experience across all supported devices.
+- **Material Design**: Modern Material You interface with dynamic theming
+- **Metadata Editing**: Edit Title, Artist, Album, Year, Genre, Track/Disc numbers
+- **Cover Art Management**: View and update album artwork
+- **Format Conversion**: Convert audio files to WAV or FLAC
+- **Recursive Scanning**: Process entire directories at once
+- **Lyrics Support**: Search and edit synchronized lyrics via LRCLIB
+- **MusicBrainz Integration**: Automatic metadata lookup
+- **Dark Mode**: Automatic dark/light theme based on system settings
+- **Responsive UI**: Optimized for both portrait and landscape orientations
+
+## Permissions
+
+TagFix requires the following permissions:
+
+- **Storage/Media Access**: To read and modify audio files
+- **Internet**: To fetch metadata from MusicBrainz and lyrics from LRCLIB
 
 ## Building from Source
 
-### Flutter Desktop
+### Prerequisites
 
-**Prerequisites:**
-- Flutter SDK
-- **Linux**: `sudo apt-get install clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev`
-- **Windows**: Visual Studio 2022 with C++ workload
+- Flutter SDK (3.24.0 or later)
+- Android SDK with API 24+
+- Java 17
 
-**Build:**
+### Build Steps
+
 ```bash
 cd flutter_app
 flutter pub get
-
-# Linux
-flutter build linux --release
-
-# Windows
-flutter build windows --release
+flutter build apk --release
 ```
 
-### CLI & Web Version
+The APK will be located at `build/app/outputs/flutter-apk/app-release.apk`
 
-**Prerequisites:**
-- Python 3.8+
-- FFmpeg
+### Release Signing
 
-**Installation:**
+For release builds with proper signing:
+
+1. Generate a keystore:
 ```bash
-pip install -r requirements.txt
+keytool -genkey -v -keystore ~/upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
 ```
 
-**Usage:**
-- **CLI**: `python3 tagfix.py`
-- **Web**: `python3 app.py` (Access at `http://localhost:5000`)
+2. Create `android/key.properties` (see `android/key.properties.template`):
+```properties
+storePassword=<your-password>
+keyPassword=<your-password>
+keyAlias=upload
+storeFile=/path/to/upload-keystore.jks
+```
+
+3. Build the signed APK:
+```bash
+flutter build apk --release
+```
 
 ## Credits
 
 - Flutter
-- FFmpeg
+- FFmpeg Kit Flutter
 - MusicBrainz
-- Lrclib
+- LRCLIB
+- AudioTags Package
+
+## License
+
+See [LICENSE](LICENSE) file for details.

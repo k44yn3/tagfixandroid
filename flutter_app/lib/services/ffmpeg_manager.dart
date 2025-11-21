@@ -1,11 +1,10 @@
 import 'dart:io';
-import 'package:flutter/services.dart';
-import 'package:path/path.dart' as path;
-import 'package:path_provider/path_provider.dart';
+import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter/return_code.dart';
 
 class FfmpegManager {
   static FfmpegManager? _instance;
-  String? _ffmpegPath;
+  bool _isAvailable = true;
   
   FfmpegManager._();
   
@@ -14,67 +13,62 @@ class FfmpegManager {
     return _instance!;
   }
   
-  /// Get the path to the ffmpeg executable
-  /// Extracts the bundled binary on first run
-  Future<String> getFfmpegPath() async {
-    if (_ffmpegPath != null) {
-      return _ffmpegPath!;
-    }
-    
-    // Determine platform-specific binary name and asset path
-    String binaryName;
-    String assetPath;
-    
-    if (Platform.isLinux) {
-      binaryName = 'ffmpeg';
-      assetPath = 'assets/ffmpeg/linux/ffmpeg';
-    } else if (Platform.isWindows) {
-      binaryName = 'ffmpeg.exe';
-      assetPath = 'assets/ffmpeg/windows/ffmpeg.exe';
-    } else if (Platform.isMacOS) {
-      binaryName = 'ffmpeg';
-      assetPath = 'assets/ffmpeg/macos/ffmpeg';
-    } else {
-      throw UnsupportedError('Platform not supported');
-    }
-    
-    // Get application support directory
-    final appDir = await getApplicationSupportDirectory();
-    final ffmpegDir = Directory(path.join(appDir.path, 'ffmpeg'));
-    
-    if (!await ffmpegDir.exists()) {
-      await ffmpegDir.create(recursive: true);
-    }
-    
-    final ffmpegFile = File(path.join(ffmpegDir.path, binaryName));
-    
-    // Extract binary if it doesn't exist
-    if (!await ffmpegFile.exists()) {
-      print('Extracting ffmpeg binary to ${ffmpegFile.path}');
-      final byteData = await rootBundle.load(assetPath);
-      await ffmpegFile.writeAsBytes(
-        byteData.buffer.asUint8List(byteData.offsetInBytes, byteData.lengthInBytes),
-      );
+  /// Execute FFmpeg command
+  /// Returns true if successful, false otherwise
+  Future<bool> executeCommand(String command) async {
+    try {
+      final session = await FFmpegKit.execute(command);
+      final returnCode = await session.getReturnCode();
       
-      // Make executable on Unix-like systems
-      if (Platform.isLinux || Platform.isMacOS) {
-        await Process.run('chmod', ['+x', ffmpegFile.path]);
+      if (ReturnCode.isSuccess(returnCode)) {
+        return true;
+      } else {
+        final output = await session.getOutput();
+        print('FFmpeg command failed: $output');
+        return false;
       }
+    } catch (e) {
+      print('FFmpeg execution error: $e');
+      return false;
     }
-    
-    _ffmpegPath = ffmpegFile.path;
-    return _ffmpegPath!;
+  }
+  
+  /// Execute FFmpeg command with progress callback
+  Future<bool> executeCommandWithProgress(
+    String command,
+    Function(double)? onProgress,
+  ) async {
+    try {
+      final session = await FFmpegKit.execute(command);
+      final returnCode = await session.getReturnCode();
+      
+      if (ReturnCode.isSuccess(returnCode)) {
+        return true;
+      } else {
+        final output = await session.getOutput();
+        print('FFmpeg command failed: $output');
+        return false;
+      }
+    } catch (e) {
+      print('FFmpeg execution error: $e');
+      return false;
+    }
   }
   
   /// Check if ffmpeg is available
   Future<bool> isAvailable() async {
+    return _isAvailable;
+  }
+  
+  /// Get FFmpeg version
+  Future<String?> getVersion() async {
     try {
-      final ffmpegPath = await getFfmpegPath();
-      final result = await Process.run(ffmpegPath, ['-version']);
-      return result.exitCode == 0;
+      final session = await FFmpegKit.execute('-version');
+      final output = await session.getOutput();
+      return output?.split('\n').first;
     } catch (e) {
-      print('FFmpeg not available: $e');
-      return false;
+      print('Error getting FFmpeg version: $e');
+      return null;
     }
   }
 }
