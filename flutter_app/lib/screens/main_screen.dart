@@ -13,11 +13,13 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+  bool _isSearching = false;
+  final TextEditingController _searchController = TextEditingController();
+
   @override
-  void initState() {
-    super.initState();
-    _checkPermissions();
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<void> _checkPermissions() async {
@@ -33,8 +35,32 @@ class _MainScreenState extends State<MainScreen> {
 
     // Request Manage External Storage (Android 11+) for full access if needed
     if (await Permission.manageExternalStorage.isDenied) {
-      // We don't force it immediately, but we might need it for writing
-      // await Permission.manageExternalStorage.request();
+      if (mounted) {
+        // Show explanation dialog before requesting
+        await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Permission Required'),
+            content: const Text(
+              'To edit tags on files across your device, TagFix needs "All Files Access".\n\n'
+              'Please grant this permission in the next screen.'
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              FilledButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  Permission.manageExternalStorage.request();
+                },
+                child: const Text('Grant Access'),
+              ),
+            ],
+          ),
+        );
+      }
     }
   }
 
@@ -69,6 +95,49 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
+  void _showCredits() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.info_outline),
+            SizedBox(width: 8),
+            Text('Credits'),
+          ],
+        ),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Developed by @k44yn3 on GitHub'),
+            SizedBox(height: 16),
+            Text('Powered by:'),
+            Text('• MusicBrainz (Metadata)'),
+            Text('• LRCLIB (Lyrics)'),
+            Text('• Flutter & Dart'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _toggleSearch() {
+    setState(() {
+      _isSearching = !_isSearching;
+      if (!_isSearching) {
+        _searchController.clear();
+        context.read<AppState>().setSearchQuery('');
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
@@ -84,19 +153,44 @@ class _MainScreenState extends State<MainScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('TagFix'),
+          title: _isSearching
+              ? TextField(
+                  controller: _searchController,
+                  autofocus: true,
+                  decoration: const InputDecoration(
+                    hintText: 'Search artist, album, title...',
+                    border: InputBorder.none,
+                  ),
+                  onChanged: (value) {
+                    context.read<AppState>().setSearchQuery(value);
+                  },
+                )
+              : InkWell(
+                  onTap: _showCredits,
+                  borderRadius: BorderRadius.circular(8),
+                  child: const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text('TagFix'),
+                  ),
+                ),
           centerTitle: false,
           actions: [
             IconButton(
-              icon: const Icon(Icons.refresh),
-              tooltip: 'Refresh',
-              onPressed: () {
-                final currentDir = context.read<AppState>().currentDirectory;
-                if (currentDir != null) {
-                  context.read<AppState>().scanDirectory(currentDir);
-                }
-              },
+              icon: Icon(_isSearching ? Icons.close : Icons.search),
+              tooltip: _isSearching ? 'Close Search' : 'Search',
+              onPressed: _toggleSearch,
             ),
+            if (!_isSearching)
+              IconButton(
+                icon: const Icon(Icons.refresh),
+                tooltip: 'Refresh',
+                onPressed: () {
+                  final currentDir = context.read<AppState>().currentDirectory;
+                  if (currentDir != null) {
+                    context.read<AppState>().scanDirectory(currentDir);
+                  }
+                },
+              ),
           ],
         ),
         body: isLandscape

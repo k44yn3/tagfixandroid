@@ -22,6 +22,25 @@ class AppState extends ChangeNotifier {
   AudioFile? _selectedFile;
   AudioFile? get selectedFile => _selectedFile;
 
+  String _searchQuery = '';
+  String get searchQuery => _searchQuery;
+
+  void setSearchQuery(String query) {
+    _searchQuery = query;
+    notifyListeners();
+  }
+
+  List<AudioFile> get filteredFiles {
+    if (_searchQuery.isEmpty) return _files;
+    final query = _searchQuery.toLowerCase();
+    return _files.where((file) {
+      final title = (file.tags?.title ?? file.filename).toLowerCase();
+      final artist = (file.tags?.trackArtist ?? '').toLowerCase();
+      final album = (file.tags?.album ?? '').toLowerCase();
+      return title.contains(query) || artist.contains(query) || album.contains(query);
+    }).toList();
+  }
+
   Future<void> scanDirectory(String path) async {
     _isLoading = true;
     _currentDirectory = path;
