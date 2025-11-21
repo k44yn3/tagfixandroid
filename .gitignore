@@ -56,3 +56,6 @@ desktop.py
 music/
 test_ui/
 test_backend/
+
+# FFmpeg binaries – download at build time
+flutter_app/assets/ffmpeg/
