@@ -106,7 +106,7 @@ class CoverArtWidget extends StatelessWidget {
       
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Cover art preview applied. Click main Save button to keep changes.'),
+          content: Text('Cover art preview applied. Click Apply Changes button to keep changes.'),
           duration: Duration(seconds: 3),
         ),
       );

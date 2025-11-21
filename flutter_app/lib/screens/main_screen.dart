@@ -182,22 +182,24 @@ class _MainScreenState extends State<MainScreen> {
                 ),
           centerTitle: false,
           actions: [
-            IconButton(
-              icon: Icon(_isSearching ? Icons.close : Icons.search),
-              tooltip: _isSearching ? 'Close Search' : 'Search',
-              onPressed: _toggleSearch,
-            ),
-            if (!_isSearching)
+            if (selectedFile == null) ...[
               IconButton(
-                icon: const Icon(Icons.refresh),
-                tooltip: 'Refresh',
-                onPressed: () {
-                  final currentDir = context.read<AppState>().currentDirectory;
-                  if (currentDir != null) {
-                    context.read<AppState>().scanDirectory(currentDir);
-                  }
-                },
+                icon: Icon(_isSearching ? Icons.close : Icons.search),
+                tooltip: _isSearching ? 'Close Search' : 'Search',
+                onPressed: _toggleSearch,
               ),
+              if (!_isSearching)
+                IconButton(
+                  icon: const Icon(Icons.refresh),
+                  tooltip: 'Refresh',
+                  onPressed: () {
+                    final currentDir = context.read<AppState>().currentDirectory;
+                    if (currentDir != null) {
+                      context.read<AppState>().scanDirectory(currentDir);
+                    }
+                  },
+                ),
+            ],
           ],
         ),
         body: isLandscape
