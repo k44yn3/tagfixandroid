@@ -24,11 +24,6 @@ jobs:
             artifact_name: tagfix-windows.zip
             build_path: build/windows/runner/Release
 
-          - os: macos-latest
-            target: macos
-            artifact_name: tagfix-macos.zip
-            build_path: build/macos/Build/Products/Release/tagfix.app
-
     steps:
       - uses: actions/checkout@v4
 
@@ -67,10 +62,6 @@ jobs:
               ;;
             windows)
               Compress-Archive -Path ${{ matrix.build_path }}\* -DestinationPath ${{ matrix.artifact_name }}
-              ;;
-            macos)
-              cd ${{ matrix.build_path }}
-              zip -r ../../../../${{ matrix.artifact_name }} tagfix.app
               ;;
           esac
 
@@ -120,14 +111,4 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: releases/tagfix-windows.zip/tagfix-windows.zip
           asset_name: tagfix-windows.zip
-          asset_content_type: application/zip
-
-      - name: Upload macOS binary
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: releases/tagfix-macos.zip/tagfix-macos.zip
-          asset_name: tagfix-macos.zip
           asset_content_type: application/zip
