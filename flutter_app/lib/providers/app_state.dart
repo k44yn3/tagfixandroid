@@ -56,7 +56,7 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> updateTags(AudioFile file, {
+  Future<bool> updateTags(AudioFile file, {
     String? title,
     String? artist,
     String? album,
@@ -65,7 +65,7 @@ class AppState extends ChangeNotifier {
     String? trackNumber,
     String? discNumber,
   }) async {
-    if (file.tags == null) return;
+    if (file.tags == null) return false;
 
     final newTags = Tag(
       title: title ?? file.tags?.title,
@@ -93,6 +93,7 @@ class AppState extends ChangeNotifier {
         notifyListeners();
       }
     }
+    return success;
   }
 
   Future<void> renameFile(AudioFile file, String newFilename) async {

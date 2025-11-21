@@ -36,10 +36,7 @@ class _LyricsSearchDialogState extends State<LyricsSearchDialog> {
     _titleController = TextEditingController(text: widget.initialTitle);
     _albumController = TextEditingController(text: widget.initialAlbum);
     
-    // Auto-search if we have enough info
-    if (widget.initialArtist.isNotEmpty && widget.initialTitle.isNotEmpty) {
-      _search();
-    }
+    // Removed auto-search as per user request
   }
 
   @override
@@ -51,7 +48,7 @@ class _LyricsSearchDialogState extends State<LyricsSearchDialog> {
   }
 
   Future<void> _search() async {
-    if (_artistController.text.isEmpty || _titleController.text.isEmpty) {
+    if (_artistController.text.isEmpty && _titleController.text.isEmpty) {
       return;
     }
 
@@ -117,10 +114,13 @@ class _LyricsSearchDialogState extends State<LyricsSearchDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 600;
+
     return Dialog(
+      insetPadding: const EdgeInsets.all(16),
       child: Container(
-        width: 900,
-        height: 700,
+        // Removed fixed width/height, let it be responsive
+        constraints: const BoxConstraints(maxWidth: 900, maxHeight: 700),
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
@@ -141,45 +141,40 @@ class _LyricsSearchDialogState extends State<LyricsSearchDialog> {
             const SizedBox(height: 16),
             
             // Search Fields
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _artistController,
-                    decoration: const InputDecoration(
-                      labelText: 'Artist',
-                      border: OutlineInputBorder(),
-                      isDense: true,
-                    ),
-                    onSubmitted: (_) => _search(),
-                  ),
+            if (isMobile) ...[
+              TextField(
+                controller: _artistController,
+                decoration: const InputDecoration(
+                  labelText: 'Artist',
+                  border: OutlineInputBorder(),
+                  isDense: true,
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: TextField(
-                    controller: _titleController,
-                    decoration: const InputDecoration(
-                      labelText: 'Title',
-                      border: OutlineInputBorder(),
-                      isDense: true,
-                    ),
-                    onSubmitted: (_) => _search(),
-                  ),
+                onSubmitted: (_) => _search(),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _titleController,
+                decoration: const InputDecoration(
+                  labelText: 'Title',
+                  border: OutlineInputBorder(),
+                  isDense: true,
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: TextField(
-                    controller: _albumController,
-                    decoration: const InputDecoration(
-                      labelText: 'Album',
-                      border: OutlineInputBorder(),
-                      isDense: true,
-                    ),
-                    onSubmitted: (_) => _search(),
-                  ),
+                onSubmitted: (_) => _search(),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _albumController,
+                decoration: const InputDecoration(
+                  labelText: 'Album',
+                  border: OutlineInputBorder(),
+                  isDense: true,
                 ),
-                const SizedBox(width: 8),
-                FilledButton.icon(
+                onSubmitted: (_) => _search(),
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
                   onPressed: _isSearching ? null : _search,
                   icon: _isSearching 
                       ? const SizedBox(
@@ -190,123 +185,96 @@ class _LyricsSearchDialogState extends State<LyricsSearchDialog> {
                       : const Icon(Icons.search),
                   label: const Text('Search'),
                 ),
-              ],
-            ),
+              ),
+            ] else ...[
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _artistController,
+                      decoration: const InputDecoration(
+                        labelText: 'Artist',
+                        border: OutlineInputBorder(),
+                        isDense: true,
+                      ),
+                      onSubmitted: (_) => _search(),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: TextField(
+                      controller: _titleController,
+                      decoration: const InputDecoration(
+                        labelText: 'Title',
+                        border: OutlineInputBorder(),
+                        isDense: true,
+                      ),
+                      onSubmitted: (_) => _search(),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: TextField(
+                      controller: _albumController,
+                      decoration: const InputDecoration(
+                        labelText: 'Album',
+                        border: OutlineInputBorder(),
+                        isDense: true,
+                      ),
+                      onSubmitted: (_) => _search(),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  FilledButton.icon(
+                    onPressed: _isSearching ? null : _search,
+                    icon: _isSearching 
+                        ? const SizedBox(
+                            width: 16, 
+                            height: 16, 
+                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)
+                          )
+                        : const Icon(Icons.search),
+                    label: const Text('Search'),
+                  ),
+                ],
+              ),
+            ],
             const SizedBox(height: 16),
             
             // Content Area
             Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Results List
-                  Expanded(
-                    flex: 2,
-                    child: Column(
+              child: isMobile
+                  ? Column(
+                      children: [
+                        // Results List (Mobile)
+                        Expanded(
+                          flex: 1,
+                          child: _buildResultsList(context),
+                        ),
+                        const SizedBox(height: 16),
+                        // Preview Area (Mobile)
+                        Expanded(
+                          flex: 1,
+                          child: _buildPreviewArea(context),
+                        ),
+                      ],
+                    )
+                  : Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Results (${_results.length})',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        const SizedBox(height: 8),
+                        // Results List (Desktop/Tablet)
                         Expanded(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: _results.isEmpty && !_isSearching
-                                ? const Center(child: Text('No results found'))
-                                : ListView.separated(
-                                    itemCount: _results.length,
-                                    separatorBuilder: (context, index) => const Divider(height: 1),
-                                    itemBuilder: (context, index) {
-                                      final result = _results[index];
-                                      final isSelected = _selectedResult?.id == result.id;
-                                      
-                                      return ListTile(
-                                        selected: isSelected,
-                                        selectedTileColor: Theme.of(context).colorScheme.primaryContainer,
-                                        title: Text(result.name, maxLines: 1, overflow: TextOverflow.ellipsis),
-                                        subtitle: Text(
-                                          '${result.artistName} • ${result.albumName}',
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        trailing: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            if (result.syncedLyrics != null)
-                                              Container(
-                                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                                margin: const EdgeInsets.only(right: 4),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.green.withOpacity(0.2),
-                                                  borderRadius: BorderRadius.circular(4),
-                                                  border: Border.all(color: Colors.green),
-                                                ),
-                                                child: const Text(
-                                                  'SYNCED',
-                                                  style: TextStyle(fontSize: 10, color: Colors.green, fontWeight: FontWeight.bold),
-                                                ),
-                                              ),
-                                            Text(_formatDuration(result.duration)),
-                                          ],
-                                        ),
-                                        onTap: () => _selectResult(result),
-                                      );
-                                    },
-                                  ),
-                          ),
+                          flex: 2,
+                          child: _buildResultsList(context),
+                        ),
+                        const SizedBox(width: 16),
+                        // Preview Area (Desktop/Tablet)
+                        Expanded(
+                          flex: 3,
+                          child: _buildPreviewArea(context),
                         ),
                       ],
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  
-                  // Preview Area
-                  Expanded(
-                    flex: 3,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Preview',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        const SizedBox(height: 8),
-                        Expanded(
-                          child: Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
-                            ),
-                            child: _isLoadingPreview
-                                ? const Center(child: CircularProgressIndicator())
-                                : _previewLyrics == null
-                                    ? Center(
-                                        child: Text(
-                                          'Select a result to preview lyrics',
-                                          style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
-                                        ),
-                                      )
-                                    : SingleChildScrollView(
-                                        child: SelectableText(
-                                          _previewLyrics!,
-                                          style: const TextStyle(fontFamily: 'monospace'),
-                                        ),
-                                      ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
             ),
             const SizedBox(height: 16),
             
@@ -330,6 +298,108 @@ class _LyricsSearchDialogState extends State<LyricsSearchDialog> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildResultsList(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Results (${_results.length})',
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        const SizedBox(height: 8),
+        Expanded(
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: _results.isEmpty && !_isSearching
+                ? const Center(child: Text('No results found'))
+                : ListView.separated(
+                    itemCount: _results.length,
+                    separatorBuilder: (context, index) => const Divider(height: 1),
+                    itemBuilder: (context, index) {
+                      final result = _results[index];
+                      final isSelected = _selectedResult?.id == result.id;
+                      
+                      return ListTile(
+                        selected: isSelected,
+                        selectedTileColor: Theme.of(context).colorScheme.primaryContainer,
+                        title: Text(result.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+                        subtitle: Text(
+                          '${result.artistName} • ${result.albumName}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (result.syncedLyrics != null)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                margin: const EdgeInsets.only(right: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.green.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(color: Colors.green),
+                                ),
+                                child: const Text(
+                                  'SYNCED',
+                                  style: TextStyle(fontSize: 10, color: Colors.green, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            Text(_formatDuration(result.duration)),
+                          ],
+                        ),
+                        onTap: () => _selectResult(result),
+                      );
+                    },
+                  ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPreviewArea(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Preview',
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        const SizedBox(height: 8),
+        Expanded(
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+            ),
+            child: _isLoadingPreview
+                ? const Center(child: CircularProgressIndicator())
+                : _previewLyrics == null
+                    ? Center(
+                        child: Text(
+                          'Select a result to preview lyrics',
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                        ),
+                      )
+                    : SingleChildScrollView(
+                        child: SelectableText(
+                          _previewLyrics!,
+                          style: const TextStyle(fontFamily: 'monospace'),
+                        ),
+                      ),
+          ),
+        ),
+      ],
     );
   }
 }

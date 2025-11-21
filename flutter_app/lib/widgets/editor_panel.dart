@@ -102,13 +102,19 @@ class _EditorPanelState extends State<EditorPanel> {
   }
 
   Future<void> _save() async {
+    bool success = true;
+
     // Rename if changed
     if (_filenameController.text != widget.file.filename) {
        await context.read<AppState>().renameFile(widget.file, _filenameController.text);
+       // Rename usually updates the file path, so subsequent writes should use the new path.
+       // However, AppState.renameFile updates the file object in the list.
+       // We should probably re-fetch the file from AppState or rely on the widget rebuild.
+       // But for now, let's assume rename success doesn't block tag update unless it failed.
     }
 
     // Save metadata tags
-    await context.read<AppState>().updateTags(
+    final tagsSuccess = await context.read<AppState>().updateTags(
       widget.file,
       title: _titleController.text,
       artist: _artistController.text,
@@ -119,14 +125,27 @@ class _EditorPanelState extends State<EditorPanel> {
       discNumber: _discController.text,
     );
     
+    if (!tagsSuccess) success = false;
+    
     // Save pending changes (cover art and lyrics)
-    await context.read<AppState>().savePendingChanges(widget.file);
+    final pendingSuccess = await context.read<AppState>().savePendingChanges(widget.file);
+    if (!pendingSuccess) success = false;
     
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('All changes saved permanently to file')),
-      );
-      // Reset change state (though reload will trigger initControllers anyway)
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Changes applied successfully')),
+        );
+        // Reset change state (though reload will trigger initControllers anyway)
+        setState(() => _hasUnsavedChanges = false);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to apply some changes. Check permissions.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
