@@ -9,7 +9,7 @@ A powerful audio metadata editor supporting FLAC, MP3, M4A, OGG, OPUS, WMA, and 
 Pre-built binaries are available for:
 - **Windows** (Portable .zip)
 - **Linux** (Portable .zip)
-- **Android** (.apk)
+- **Linux** (Portable .zip)
 
 ## Features
 
@@ -22,7 +22,7 @@ Pre-built binaries are available for:
 
 ## Building from Source
 
-### Flutter Desktop & Android
+### Flutter Desktop
 
 **Prerequisites:**
 - Flutter SDK
@@ -39,9 +39,6 @@ flutter build linux --release
 
 # Windows
 flutter build windows --release
-
-# Android
-flutter build apk --release
 ```
 
 ### CLI & Web Version
