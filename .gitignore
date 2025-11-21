@@ -1,31 +1,49 @@
-# Flutter/Dart
-flutter_app/build/
-flutter_app/.dart_tool/
-flutter_app/.packages
-flutter_app/.flutter-plugins
-flutter_app/.flutter-plugins-dependencies
-flutter_app/pubspec.lock
-
-# Android
-flutter_app/android/.gradle/
-flutter_app/android/app/build/
-flutter_app/android/app/.cxx/
-flutter_app/android/captures/
-flutter_app/android/local.properties
-flutter_app/android/key.properties
-flutter_app/android/*.jks
-flutter_app/android/*.keystore
-
-# IDE
-.vscode/
-.idea/
+# Miscellaneous
+*.class
+*.log
+*.pyc
 *.swp
 *.swo
 *~
 .DS_Store
 Thumbs.db
+.atom/
+.buildlog/
+.history
+.svn/
 
-# Audio files (for testing)
+# IntelliJ / Android Studio
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# VS Code
+.vscode/
+
+# Flutter/Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+build/
+coverage/
+
+# Android
+**/android/local.properties
+**/android/key.properties
+**/android/*.jks
+**/android/*.keystore
+**/android/.gradle
+**/android/captures/
+**/android/app/build/
+**/android/app/.cxx/
+**/android/app/release/
+**/android/app/debug/
+**/android/app/profile/
+
+# Audio files (for testing/dev)
 *.mp3
 *.flac
 *.wav
@@ -37,6 +55,8 @@ music/
 test_audio/
 
 # Logs
-*.log
 logs/
 logx/
+
+# Temporary / Generated
+releases/
