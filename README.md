@@ -55,7 +55,7 @@ The APK will be located at `build/app/outputs/flutter-apk/app-release.apk`
 
 ## Credits
 
-- Ported from the original [TagFix]([https](https://github.com/k44yn3/tagfix)
+- Ported from the original [TagFix](https://github.com/k44yn3/tagfix)
 - Flutter
 - MusicBrainz
 - LRCLIB
